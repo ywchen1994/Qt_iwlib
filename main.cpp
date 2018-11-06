@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <iwlib.h>
+#include<string>
+#include<iostream>
+using namespace std;
 static char *NetCardID = strdup("wlp5s0");
 void do_scan(int sock, iwrange *range)
 {
     wireless_scan_head head;
     wireless_scan *result;
-    char buffer[128];
+
 
     /* Perform the scan */
     if (iw_scan(sock,NetCardID, range->we_version_compiled, &head) < 0) {
@@ -17,28 +20,19 @@ void do_scan(int sock, iwrange *range)
     /* Traverse the results */
     result = head.result;
     while (result != nullptr) {
-        printf("ESSID: %s\n", result->b.essid);
-        //if ((result->b.key_flags & IW_ENCODE_DISABLED) == IW_ENCODE_DISABLED)
-        if (result->b.has_key) {
-            /* Display the key */
-            iw_print_key(buffer, sizeof(buffer), result->b.key, result->b.key_size,
-                     result->b.key_flags);
-            printf("key: %s\n", buffer);
-        }
-        if (result->has_ap_addr) {
-            printf("sawap: %s\n", iw_sawap_ntop(&result->ap_addr, buffer));
-        }
+        string ESSID=result->b.essid;
+        cout<<ESSID<<endl;
+
         if (result->b.has_freq) {
-            iw_print_freq_value(buffer, sizeof(buffer), result->b.freq);
-            printf("freq: %s\n", buffer);
+            double freq=result->b.freq/pow(10,9);
+            cout<<freq<<"GHz"<<endl;
+
         }
-        if (result->has_maxbitrate) {
-            iw_print_bitrate(buffer, sizeof(buffer), result->maxbitrate.value);
-            printf("bitrate: %s\n", buffer);
-        }
+
         if (result->has_stats) {
-            iw_print_stats(buffer, sizeof(buffer), &result->stats.qual, range, 1);
-            printf("stats: %s\n", buffer);
+            int level=result->stats.qual.level- 0x100;
+            cout<<level<<"dB"<<endl;
+
         }
         printf("------------------\n");
         result = result->next;
