@@ -16,15 +16,24 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->m_ScanTable->setColumnCount(2);
 
     QStringList header;
-    header<<"Frequency"<<"Numbers";
+    header<<"Frequency(GHz)"<<"Numbers";
     ui->m_ScanTable->setHorizontalHeaderLabels(header);
 
     for(uint_fast8_t i=0;i<13;i++)
     {
         ui->m_ScanTable->setItem(i,0,new QTableWidgetItem(QString::number(2.412+(double)i*0.005)));
-         ui->m_ScanTable->setItem(i,1,new QTableWidgetItem(QString::number(0)));
+        ui->m_ScanTable->setItem(i,1,new QTableWidgetItem(QString::number(0)));
     }
     /***********************************************************/
+
+    ui->m_ScanTableID->setRowCount(15);
+    ui->m_ScanTableID->setColumnCount(3);
+    header.clear();
+    header<<"ID"<<"Frequency(GHz)"<<"Amptitude(dB)";
+    ui->m_ScanTableID->setHorizontalHeaderLabels(header);
+
+    /***********************************************************/
+
     sock=iw_sockets_open();
     if (iw_get_range_info(sock, NetCardID, &range) < 0) {
         QMessageBox::critical(this,tr("Error"),tr("iw_get_range_info. Aborting"));
@@ -46,8 +55,15 @@ void MainWindow::Timer1_tricker()
     for(uint_fast8_t i=0;i<13;i++)
         if(channelCounter[i]!=0)
             ui->m_ScanTable->setItem(i,1,new QTableWidgetItem(QString::number(channelCounter[i])));
-
+    ui->m_ScanTableID->setRowCount(WifiScanData.size());
+    for(uint_fast8_t i=0;i<WifiScanData.size();i++)
+    {
+        ui->m_ScanTableID->setItem(i,0,new QTableWidgetItem(QString::fromStdString((WifiScanData[i].getID()))));
+        ui->m_ScanTableID->setItem(i,1,new QTableWidgetItem(QString::number(WifiScanData[i].getFreq())));
+        ui->m_ScanTableID->setItem(i,2,new QTableWidgetItem(QString::number(WifiScanData[i].getAmp())));
+    }
 }
+
 void MainWindow::do_scan()
 {
     wireless_scan_head head;

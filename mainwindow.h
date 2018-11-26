@@ -1,12 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+#include<qdebug.h>
 #include <QMainWindow>
 #include <iwlib.h>
 #include<QTimer>
 #include<QMessageBox>
 #include<QVector>
 #include<wifiinfopack.h>
+#include<iostream>
 
 using namespace std;
 
